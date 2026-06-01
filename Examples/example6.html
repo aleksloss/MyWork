@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Logical Fallacies Quiz</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #111827;
+      --card-alt: #1f2937;
+      --text: #e2e8f0;
+      --accent: #38bdf8;
+      --success: #34d399;
+      --warning: #fbbf24;
+      --shadow: 0 18px 60px rgba(15, 23, 42, 0.35);
+      font-family: Inter, system-ui, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle at top, rgba(56, 189, 248, 0.16), transparent 25%),
+        linear-gradient(180deg, #111827 0%, #0f172a 100%);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .app-shell {
+      width: min(980px, 100%);
+      display: grid;
+      gap: 20px;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 20px 28px;
+      border-radius: 28px;
+      background: rgba(30, 41, 59, 0.9);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: clamp(1.6rem, 2vw, 2.2rem);
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      border-radius: 999px;
+      background: rgba(59, 130, 246, 0.15);
+      color: #bfdbfe;
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+
+    .card {
+      background: rgba(15, 23, 42, 0.96);
+      border: 1px solid rgba(148, 163, 184, 0.12);
+      border-radius: 32px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .card header,
+    .card .body,
+    .card footer {
+      padding: 28px;
+    }
+
+    .question-index {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 42px;
+      width: 42px;
+      border-radius: 50%;
+      background: rgba(56, 189, 248, 0.12);
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .question-title {
+      margin-top: 18px;
+      margin-bottom: 24px;
+      font-size: clamp(1.15rem, 1.5vw, 1.35rem);
+      line-height: 1.5;
+    }
+
+    .option-grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .option {
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      border-radius: 20px;
+      padding: 18px 20px;
+      background: var(--card-alt);
+      color: var(--text);
+      cursor: pointer;
+      transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+    }
+
+    .option:hover {
+      transform: translateY(-1px);
+      border-color: rgba(56, 189, 248, 0.35);
+    }
+
+    .option.selected {
+      border-color: rgba(52, 211, 153, 0.45);
+      background: rgba(52, 211, 153, 0.08);
+    }
+
+    .option.correct {
+      border-color: rgba(34, 197, 94, 0.7);
+      background: rgba(34, 197, 94, 0.12);
+    }
+
+    .option.incorrect {
+      border-color: rgba(248, 113, 113, 0.7);
+      background: rgba(248, 113, 113, 0.12);
+    }
+
+    .explanation {
+      margin-top: 18px;
+      padding: 18px;
+      border-radius: 18px;
+      background: rgba(30, 41, 59, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.14);
+      line-height: 1.7;
+    }
+
+    .explanation strong {
+      color: var(--accent);
+    }
+
+    .footer-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .button,
+    .button-secondary,
+    .button-reset {
+      border: none;
+      border-radius: 999px;
+      padding: 14px 22px;
+      font-size: 0.98rem;
+      cursor: pointer;
+      transition: background 180ms ease, transform 180ms ease;
+      min-width: 140px;
+    }
+
+    .button {
+      background: linear-gradient(135deg, #38bdf8, #60a5fa);
+      color: #0f172a;
+    }
+
+    .button-secondary {
+      background: rgba(148, 163, 184, 0.12);
+      color: #cbd5e1;
+    }
+
+    .button-reset {
+      background: rgba(248, 113, 113, 0.18);
+      color: #fee2e2;
+    }
+
+    .button:hover,
+    .button-secondary:hover,
+    .button-reset:hover {
+      transform: translateY(-1px);
+    }
+
+    .final-result {
+      display: grid;
+      gap: 18px;
+      text-align: center;
+    }
+
+    .final-result h2 {
+      margin: 0;
+      font-size: clamp(1.5rem, 2vw, 2.4rem);
+      letter-spacing: -0.04em;
+    }
+
+    .final-score {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 16px 20px;
+      background: rgba(56, 189, 248, 0.16);
+      border-radius: 20px;
+      font-size: 1.05rem;
+      font-weight: 700;
+    }
+
+    .signature {
+      font-size: 0.9rem;
+      color: #94a3b8;
+    }
+
+    @media (max-width: 640px) {
+      .card header,
+      .card .body,
+      .card footer {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app-shell">
+    <header>
+      <div>
+        <h1>Logical Fallacies Quiz</h1>
+        <p class="signature">Learn common mistakes in reasoning while testing your knowledge.</p>
+      </div>
+      <div class="status-pill">
+        <span id="questionCounter">Question 1 of 5</span>
+      </div>
+    </header>
+
+    <section class="card" id="quizCard">
+      <header>
+        <div class="question-index" id="questionNumber">1</div>
+        <div class="question-title" id="questionText">Loading question...</div>
+      </header>
+
+      <div class="body">
+        <div class="option-grid" id="optionGrid"></div>
+        <div class="explanation" id="explanation" hidden></div>
+      </div>
+
+      <footer class="footer-row">
+        <div>
+          <span class="status-pill" id="scoreDisplay">Score: 0</span>
+        </div>
+        <div>
+          <button class="button-secondary" id="nextButton" disabled>Next Question</button>
+          <button class="button-reset" id="resetButton">Restart</button>
+        </div>
+      </footer>
+    </section>
+
+    <section class="card" id="finalCard" style="display:none;">
+      <header>
+        <div class="final-result">
+          <h2>Quiz Complete</h2>
+          <div class="final-score" id="finalScore"></div>
+          <p id="finalMessage"></p>
+        </div>
+      </header>
+      <footer class="footer-row" style="justify-content:center; padding: 28px;">
+        <button class="button" id="restartButton">Try Again</button>
+      </footer>
+    </section>
+  </main>
+
+  <script>
+    const questions = [
+      {
+        text: '“If we ban plastic straws, the next step is banning all packaging. We must stop the straws ban now.” Which fallacy is this?',
+        choices: ['Slippery Slope', 'Straw Man', 'Ad Hominem', 'Appeal to Authority'],
+        answer: 0,
+        explanation: 'This is a slippery slope because it assumes one step will inevitably lead to a chain of negative events without evidence.'
+      },
+      {
+        text: '“You cannot trust her argument on climate change because she is not a scientist.” What fallacy is this?',
+        choices: ['Bandwagon', 'Appeal to Emotion', 'Ad Hominem', 'False Dilemma'],
+        answer: 2,
+        explanation: 'Ad hominem attacks the person making the argument rather than the argument itself.'
+      },
+      {
+        text: '“Either we increase surveillance now or our city will never be safe.” This is an example of which fallacy?',
+        choices: ['False Dilemma', 'Circular Reasoning', 'Red Herring', 'Post Hoc'],
+        answer: 0,
+        explanation: 'A false dilemma presents only two options when more may exist.'
+      },
+      {
+        text: '“After I started carrying a lucky charm, my grades improved. The charm must be why I did better.” This is:',
+        choices: ['Hasty Generalization', 'Post Hoc', 'Appeal to Ignorance', 'Begging the Question'],
+        answer: 1,
+        explanation: 'Post hoc assumes causation from mere sequence: because one event followed another, the first caused the second.'
+      },
+      {
+        text: '“Most people support this diet, so it must be the right choice.” Which fallacy is this?',
+        choices: ['Appeal to Popularity', 'Equivocation', 'Reductio ad Absurdum', 'No True Scotsman'],
+        answer: 0,
+        explanation: 'This is an appeal to popularity: using how many people believe something as evidence that it is true.'
+      }
+    ];
+
+    const questionText = document.getElementById('questionText');
+    const questionNumber = document.getElementById('questionNumber');
+    const questionCounter = document.getElementById('questionCounter');
+    const optionGrid = document.getElementById('optionGrid');
+    const explanation = document.getElementById('explanation');
+    const nextButton = document.getElementById('nextButton');
+    const resetButton = document.getElementById('resetButton');
+    const scoreDisplay = document.getElementById('scoreDisplay');
+    const quizCard = document.getElementById('quizCard');
+    const finalCard = document.getElementById('finalCard');
+    const finalScore = document.getElementById('finalScore');
+    const finalMessage = document.getElementById('finalMessage');
+    const restartButton = document.getElementById('restartButton');
+
+    let currentIndex = 0;
+    let score = 0;
+    let selectedIndex = null;
+    let answered = false;
+
+    function renderQuestion() {
+      const current = questions[currentIndex];
+      questionText.textContent = current.text;
+      questionNumber.textContent = String(currentIndex + 1);
+      questionCounter.textContent = `Question ${currentIndex + 1} of ${questions.length}`;
+      scoreDisplay.textContent = `Score: ${score}`;
+      explanation.hidden = true;
+      explanation.textContent = '';
+      nextButton.disabled = true;
+      selectedIndex = null;
+      answered = false;
+      optionGrid.innerHTML = '';
+
+      current.choices.forEach((choice, index) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'option';
+        button.textContent = choice;
+        button.addEventListener('click', () => selectOption(index));
+        optionGrid.appendChild(button);
+      });
+    }
+
+    function selectOption(index) {
+      if (answered) return;
+      selectedIndex = index;
+      const buttons = [...optionGrid.children];
+      buttons.forEach((button, idx) => {
+        button.classList.toggle('selected', idx === index);
+      });
+      nextButton.disabled = false;
+    }
+
+    function showAnswer() {
+      if (selectedIndex === null || answered) return;
+      answered = true;
+      const current = questions[currentIndex];
+      const buttons = [...optionGrid.children];
+      buttons.forEach((button, idx) => {
+        button.disabled = true;
+        if (idx === current.answer) {
+          button.classList.add('correct');
+        }
+        if (idx === selectedIndex && idx !== current.answer) {
+          button.classList.add('incorrect');
+        }
+      });
+
+      if (selectedIndex === current.answer) {
+        score += 1;
+        scoreDisplay.textContent = `Score: ${score}`;
+      }
+
+      explanation.innerHTML = `<strong>Explanation:</strong> ${current.explanation}`;
+      explanation.hidden = false;
+      nextButton.textContent = currentIndex < questions.length - 1 ? 'Next Question' : 'Finish Quiz';
+    }
+
+    nextButton.addEventListener('click', () => {
+      if (!answered) {
+        showAnswer();
+        return;
+      }
+      currentIndex += 1;
+      if (currentIndex >= questions.length) {
+        showFinalResult();
+        return;
+      }
+      renderQuestion();
+      nextButton.textContent = 'Reveal Answer';
+    });
+
+    function showFinalResult() {
+      quizCard.style.display = 'none';
+      finalCard.style.display = 'block';
+      finalScore.textContent = `${score} / ${questions.length}`;
+      const percentage = Math.round((score / questions.length) * 100);
+      let message = 'You have a strong foundation in spotting fallacies.';
+      if (percentage <= 40) {
+        message = 'Good start! Review the explanations and try again to sharpen your reasoning skills.';
+      } else if (percentage <= 80) {
+        message = 'Solid performance. A little practice will make your reasoning even stronger.';
+      }
+      finalMessage.textContent = message;
+    }
+
+    function resetQuiz() {
+      currentIndex = 0;
+      score = 0;
+      quizCard.style.display = 'block';
+      finalCard.style.display = 'none';
+      nextButton.textContent = 'Reveal Answer';
+      renderQuestion();
+    }
+
+    resetButton.addEventListener('click', resetQuiz);
+    restartButton.addEventListener('click', resetQuiz);
+
+    renderQuestion();
+  </script>
+</body>
+</html>

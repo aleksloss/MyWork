@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shake to Clear</title>
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, system-ui, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      position: relative;
+    }
+    .container {
+      text-align: center;
+      padding: 2rem;
+      z-index: 1;
+    }
+    h1 {
+      margin: 0 0 1rem;
+      font-size: 3rem;
+      letter-spacing: -0.02em;
+    }
+    p {
+      margin: 0 0 2rem;
+      font-size: 1.2rem;
+      opacity: 0.9;
+    }
+    .shake-hint {
+      font-size: 1rem;
+      opacity: 0.7;
+      margin-bottom: 2rem;
+    }
+    .element {
+      position: absolute;
+      width: 60px;
+      height: 60px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: bold;
+      transition: transform 0.5s ease, opacity 0.5s ease;
+      will-change: transform, opacity;
+    }
+    .element.falling {
+      animation: fall 1s ease-in forwards;
+    }
+    .element.disappearing {
+      animation: disappear 0.5s ease-out forwards;
+    }
+    @keyframes fall {
+      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+    }
+    @keyframes disappear {
+      0% { transform: scale(1); opacity: 1; }
+      100% { transform: scale(0); opacity: 0; }
+    }
+    .reset-button {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 25px;
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      font-size: 1rem;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      transition: all 0.3s ease;
+    }
+    .reset-button:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Shake to Clear</h1>
+    <p>Shake your mouse quickly from side to side to make the elements fall or disappear!</p>
+    <div class="shake-hint">Try moving the mouse rapidly left and right.</div>
+    <button class="reset-button" id="resetButton">Reset Elements</button>
+  </div>
+
+  <!-- Elements to shake away -->
+  <div class="element" style="top: 20%; left: 10%;">★</div>
+  <div class="element" style="top: 15%; right: 15%;">●</div>
+  <div class="element" style="bottom: 25%; left: 20%;">◆</div>
+  <div class="element" style="top: 40%; right: 25%;">▲</div>
+  <div class="element" style="bottom: 30%; left: 70%;">■</div>
+  <div class="element" style="top: 60%; right: 10%;">○</div>
+  <div class="element" style="bottom: 15%; left: 40%;">♥</div>
+  <div class="element" style="top: 25%; left: 80%;">♦</div>
+
+  <script>
+    const elements = document.querySelectorAll('.element');
+    const resetButton = document.getElementById('resetButton');
+    let lastX = 0;
+    let lastTime = 0;
+    let shakeCount = 0;
+    const shakeThreshold = 20; // pixels per frame
+    const shakeTimeWindow = 500; // ms
+    let shakeTimer;
+
+    function detectShake(event) {
+      const currentTime = Date.now();
+      const deltaX = Math.abs(event.clientX - lastX);
+      const deltaTime = currentTime - lastTime;
+
+      if (deltaTime < 100 && deltaX > shakeThreshold) {
+        shakeCount++;
+        clearTimeout(shakeTimer);
+        shakeTimer = setTimeout(() => {
+          if (shakeCount >= 3) {
+            triggerClear();
+          }
+          shakeCount = 0;
+        }, shakeTimeWindow);
+      }
+
+      lastX = event.clientX;
+      lastTime = currentTime;
+    }
+
+    function triggerClear() {
+      elements.forEach((el, index) => {
+        setTimeout(() => {
+          if (index % 2 === 0) {
+            el.classList.add('falling');
+          } else {
+            el.classList.add('disappearing');
+          }
+        }, index * 100);
+      });
+    }
+
+    function resetElements() {
+      elements.forEach(el => {
+        el.classList.remove('falling', 'disappearing');
+        el.style.animation = 'none';
+        setTimeout(() => el.style.animation = '', 10);
+      });
+    }
+
+    window.addEventListener('mousemove', detectShake);
+    resetButton.addEventListener('click', resetElements);
+  </script>
+</body>
+</html>

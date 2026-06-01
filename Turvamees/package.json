@@ -1,0 +1,12 @@
+{
+  "name": "camera-motion-app",
+  "version": "1.0.0",
+  "description": "Camera motion direction alarm app",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.3"
+  }
+}

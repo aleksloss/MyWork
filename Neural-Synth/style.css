@@ -1,0 +1,60 @@
+/* Dark background and full-screen canvas */
+html,body{
+  height:100%;
+  margin:0;
+}
+body{
+  background: #06070b;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+  overflow:hidden;
+}
+#drawCanvas{
+  position:fixed;
+  inset:0;
+  width:100%;
+  height:100%;
+  display:block;
+  cursor:crosshair;
+}
+.toolbar{
+  position:fixed;
+  left:16px;
+  top:16px;
+  z-index:20;
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  align-items:center;
+  background: rgba(10,10,14,0.6);
+  border:1px solid rgba(255,255,255,0.08);
+  padding:10px 12px;
+  border-radius:14px;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 10px 28px rgba(0,0,0,0.45);
+}
+.toolbar .control-group{
+  display:flex;
+  gap:8px;
+  align-items:center;
+}
+.toolbar button,
+.toolbar label{
+  min-height:40px;
+}
+.toolbar button{
+  background: rgba(255,255,255,0.05);
+  color:#e6eefc;
+  border:1px solid rgba(255,255,255,0.14);
+  padding:10px 14px;
+  border-radius:10px;
+  font-weight:700;
+  transition: transform 0.16s ease, background 0.16s ease, border-color 0.16s ease;
+}
+.toolbar button:hover{
+  transform: translateY(-1px);
+  background: rgba(255,255,255,0.12);
+  border-color: rgba(255,255,255,0.26);
+}
+.toolbar label{ color:#dfefff; font-weight:600; font-size:13px; display:flex; align-items:center; gap:8px; }
+.toolbar input[type="color"]{ width:40px; height:40px; padding:0; border:1px solid rgba(255,255,255,0.15); border-radius:12px; background:transparent; cursor:pointer; }
+

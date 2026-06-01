@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Color Splash</title>
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, system-ui, sans-serif;
+      background: #1a1a1a;
+      color: white;
+      display: grid;
+      place-items: center;
+      cursor: crosshair;
+      overflow: hidden;
+      position: relative;
+    }
+    .container {
+      text-align: center;
+      padding: 2rem;
+      z-index: 1;
+    }
+    h1 {
+      margin: 0 0 1rem;
+      font-size: 3rem;
+      letter-spacing: -0.02em;
+    }
+    p {
+      margin: 0;
+      font-size: 1.2rem;
+      opacity: 0.9;
+      max-width: 600px;
+    }
+    .splash {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      animation: grow 0.5s ease-out forwards;
+      z-index: 10;
+    }
+    @keyframes grow {
+      from {
+        width: 0;
+        height: 0;
+        opacity: 1;
+      }
+      to {
+        width: var(--size);
+        height: var(--size);
+        opacity: 0.7;
+      }
+    }
+    .splash.shrinking {
+      animation: shrink 0.3s ease-in forwards;
+    }
+    @keyframes shrink {
+      to {
+        width: 0;
+        height: 0;
+        opacity: 0;
+      }
+    }
+    .clear-button {
+      margin-top: 2rem;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 25px;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      font-size: 1rem;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: all 0.3s ease;
+    }
+    .clear-button:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Color Splash</h1>
+    <p>Click and hold to create growing color splashes. Release to stop the growth.</p>
+    <button class="clear-button" id="clearButton">Clear All Splashes</button>
+  </div>
+
+  <script>
+    const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24', '#f093fb', '#f5576c', '#4facfe', '#00f2fe', '#43e97b', '#38f9d7'];
+    const body = document.body;
+    const clearButton = document.getElementById('clearButton');
+    let currentSplash = null;
+    let growthInterval = null;
+    let size = 0;
+
+    function getRandomColor() {
+      return colors[Math.floor(Math.random() * colors.length)];
+    }
+
+    function startSplash(x, y) {
+      if (currentSplash) return;
+
+      currentSplash = document.createElement('div');
+      currentSplash.className = 'splash';
+      currentSplash.style.left = `${x}px`;
+      currentSplash.style.top = `${y}px`;
+      currentSplash.style.background = getRandomColor();
+      body.appendChild(currentSplash);
+
+      size = 0;
+      growthInterval = setInterval(() => {
+        size += 5;
+        currentSplash.style.setProperty('--size', `${size}px`);
+      }, 16); // ~60fps
+    }
+
+    function stopSplash() {
+      if (!currentSplash) return;
+
+      clearInterval(growthInterval);
+      currentSplash.classList.add('shrinking');
+      setTimeout(() => {
+        if (currentSplash && currentSplash.parentNode) {
+          currentSplash.parentNode.removeChild(currentSplash);
+        }
+        currentSplash = null;
+      }, 300);
+    }
+
+    function clearSplashes() {
+      const splashes = document.querySelectorAll('.splash');
+      splashes.forEach(splash => {
+        if (splash.parentNode) {
+          splash.parentNode.removeChild(splash);
+        }
+      });
+      if (currentSplash) {
+        clearInterval(growthInterval);
+        currentSplash = null;
+      }
+    }
+
+    body.addEventListener('mousedown', (event) => {
+      if (event.target === clearButton) return;
+      startSplash(event.clientX, event.clientY);
+    });
+
+    body.addEventListener('mouseup', stopSplash);
+
+    clearButton.addEventListener('click', clearSplashes);
+  </script>
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hover Glitch Effect</title>
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, system-ui, sans-serif;
+      background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%);
+      color: white;
+      display: grid;
+      place-items: center;
+      padding: 2rem;
+    }
+    .container {
+      text-align: center;
+      max-width: 800px;
+    }
+    h1 {
+      margin: 0 0 2rem;
+      font-size: 3rem;
+      letter-spacing: -0.02em;
+    }
+    .image-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+    .glitch-image {
+      width: 100%;
+      height: 200px;
+      background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #f9ca24);
+      background-size: 400% 400%;
+      border-radius: 12px;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+    .glitch-image::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s ease;
+    }
+    .glitch-image:hover::before {
+      left: 100%;
+    }
+    .glitch-image:hover {
+      animation: glitch 0.3s ease-in-out;
+    }
+    @keyframes glitch {
+      0% { transform: translate(0); filter: hue-rotate(0deg); }
+      20% { transform: translate(-2px, 2px); filter: hue-rotate(90deg); }
+      40% { transform: translate(-2px, -2px); filter: hue-rotate(180deg); }
+      60% { transform: translate(2px, 2px); filter: hue-rotate(270deg); }
+      80% { transform: translate(2px, -2px); filter: hue-rotate(0deg); }
+      100% { transform: translate(0); filter: hue-rotate(0deg); }
+    }
+    .image-label {
+      margin-top: 0.5rem;
+      font-size: 1rem;
+      opacity: 0.8;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Hover Glitch Effect</h1>
+    <p>Hover over the images below to see the glitch effect in action.</p>
+    <div class="image-grid">
+      <div class="glitch-image" data-label="Image 1"></div>
+      <div class="glitch-image" data-label="Image 2"></div>
+      <div class="glitch-image" data-label="Image 3"></div>
+      <div class="glitch-image" data-label="Image 4"></div>
+      <div class="glitch-image" data-label="Image 5"></div>
+      <div class="glitch-image" data-label="Image 6"></div>
+    </div>
+  </div>
+
+  <script>
+    // Add labels dynamically
+    document.querySelectorAll('.glitch-image').forEach((img, index) => {
+      const label = document.createElement('div');
+      label.className = 'image-label';
+      label.textContent = img.dataset.label;
+      img.parentNode.insertBefore(label, img.nextSibling);
+    });
+  </script>
+</body>
+</html>

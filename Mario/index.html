@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Retro Platformer</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="screen screen-menu active" id="menuScreen">
+    <div class="menu-panel">
+      <h1>Retro Platform Runner</h1>
+      <p>Jump, collect coins, defeat enemies and beat the boss!</p>
+      <button id="startButton">Start Game</button>
+      <button id="continueButton" disabled>Continue</button>
+      <div class="menu-info">
+        <span id="storedHighScore">High Score: 0</span>
+        <span id="levelInfo">Levels: 3</span>
+      </div>
+      <div class="menu-tips">
+        <div>Controls: ← / A = left, → / D = right, ↑ / W / Space = jump</div>
+        <div id="menuTip">Level 1: Start your adventure and collect coins.</div>
+      </div>
+      <a class="portfolio-link" href="index.html">Back to Portfolio</a>
+    </div>
+  </div>
+
+  <div class="screen screen-game" id="gameScreen">
+    <div class="hud">
+      <div>Score: <span id="scoreValue">0</span></div>
+      <div>Lives: <span id="livesValue">3</span></div>
+      <div>Time: <span id="timerValue">0</span>s</div>
+      <div>Level: <span id="levelValue">1</span></div>
+      <button id="soundToggleButton">Sound: On</button>
+      <button id="pauseButton">Pause</button>
+    </div>
+    <div class="hud-note">Pro tip: land on enemies from above to defeat them and gather hidden power-ups.</div>
+
+    <canvas id="gameCanvas" width="860" height="500"></canvas>
+
+    <div class="overlay hidden" id="messageOverlay">
+      <div class="overlay-box">
+        <h2 id="overlayTitle">You Win!</h2>
+        <p id="overlayText">Great work, hero.</p>
+        <button id="restartButton">Restart Game</button>
+        <button id="menuButton">Back to Menu</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>

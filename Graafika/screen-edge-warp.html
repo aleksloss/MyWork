@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Screen Edge Warp</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: 'Inter', system-ui, sans-serif;
+      background: radial-gradient(circle at top left, rgba(55, 181, 255, 0.2), transparent 22%),
+                  radial-gradient(circle at bottom right, rgba(201, 103, 255, 0.18), transparent 20%),
+                  #08101e;
+      color: #eef3ff;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .stage {
+      position: relative;
+      width: min(100%, 1100px);
+      height: min(100vh, 720px);
+      border-radius: 32px;
+      background: rgba(10, 17, 40, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 40px 120px rgba(0, 0, 0, 0.28);
+      overflow: hidden;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .instructions {
+      color: rgba(238, 243, 255, 0.78);
+      font-size: 1rem;
+      line-height: 1.8;
+      max-width: 720px;
+      place-self: start center;
+    }
+
+    .grid {
+      position: relative;
+      flex: 1;
+      min-height: 100%;
+    }
+
+    .warp-card {
+      position: absolute;
+      width: 136px;
+      height: 136px;
+      border-radius: 26px;
+      background: linear-gradient(180deg, rgba(46, 111, 255, 0.95), rgba(88, 140, 255, 0.92));
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.28);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      display: grid;
+      place-items: center;
+      color: white;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: grab;
+      user-select: none;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      touch-action: none;
+    }
+
+    .warp-card:active {
+      cursor: grabbing;
+      transform: scale(1.03);
+    }
+
+    .warp-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 26px;
+      background: radial-gradient(circle at top left, rgba(255, 255, 255, 0.18), transparent 28%);
+      pointer-events: none;
+    }
+
+    .warp-label {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+    }
+
+    .hint {
+      color: rgba(238, 243, 255, 0.72);
+      font-size: 0.95rem;
+      line-height: 1.7;
+      place-self: end center;
+      max-width: 720px;
+    }
+  </style>
+</head>
+<body>
+  <div class="stage" id="stage">
+    <div class="instructions">
+      <h1>Screen Edge Warp</h1>
+      <p>Drag any card toward the edge of the stage. When the card crosses an edge, it reappears on the opposite side — just like Pac-Man.</p>
+    </div>
+    <div class="grid" id="grid"></div>
+    <div class="hint">Drag one object out past left, right, top, or bottom edge to see the wrap-around effect.</div>
+  </div>
+
+  <script>
+    const stage = document.getElementById('stage');
+    const grid = document.getElementById('grid');
+    const cards = [];
+    let activeCard = null;
+
+    const cardData = [
+      { label: 'A', x: 80, y: 60 },
+      { label: 'B', x: 260, y: 120 },
+      { label: 'C', x: 450, y: 70 },
+      { label: 'D', x: 620, y: 160 }
+    ];
+
+    function createCard({ label, x, y }) {
+      const card = document.createElement('div');
+      card.className = 'warp-card';
+      card.style.left = `${x}px`;
+      card.style.top = `${y}px`;
+      card.innerHTML = `<div class="warp-label">${label}</div>`;
+      grid.appendChild(card);
+      return { element: card, x, y, width: 136, height: 136, pointerOffsetX: 0, pointerOffsetY: 0 };
+    }
+
+    cardData.forEach((data) => cards.push(createCard(data)));
+
+    function normalizePosition(card) {
+      const gridWidth = grid.clientWidth;
+      const gridHeight = grid.clientHeight;
+      const margin = 0;
+
+      if (card.x + card.width < -margin) {
+        card.x = gridWidth + margin;
+      }
+      if (card.x > gridWidth + margin) {
+        card.x = -card.width - margin;
+      }
+      if (card.y + card.height < -margin) {
+        card.y = gridHeight + margin;
+      }
+      if (card.y > gridHeight + margin) {
+        card.y = -card.height - margin;
+      }
+    }
+
+    function updateCardPosition(card) {
+      normalizePosition(card);
+      card.element.style.left = `${card.x}px`;
+      card.element.style.top = `${card.y}px`;
+    }
+
+    function onPointerDown(event) {
+      const card = cards.find((c) => c.element === event.currentTarget);
+      if (!card) return;
+      activeCard = card;
+      const rect = card.element.getBoundingClientRect();
+      card.pointerOffsetX = event.clientX - rect.left;
+      card.pointerOffsetY = event.clientY - rect.top;
+      event.currentTarget.setPointerCapture(event.pointerId);
+      card.element.style.zIndex = 10;
+    }
+
+    function onPointerMove(event) {
+      if (!activeCard) return;
+      const gridBounds = grid.getBoundingClientRect();
+      activeCard.x = event.clientX - gridBounds.left - activeCard.pointerOffsetX;
+      activeCard.y = event.clientY - gridBounds.top - activeCard.pointerOffsetY;
+      updateCardPosition(activeCard);
+    }
+
+    function onPointerUp() {
+      if (!activeCard) return;
+      activeCard.element.style.zIndex = '';
+      updateCardPosition(activeCard);
+      activeCard = null;
+    }
+
+    cards.forEach((card) => {
+      card.element.addEventListener('pointerdown', onPointerDown);
+      card.element.addEventListener('pointercancel', onPointerUp);
+    });
+
+    window.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('pointerup', onPointerUp);
+    window.addEventListener('resize', () => {
+      cards.forEach(updateCardPosition);
+    });
+  </script>
+</body>
+</html>

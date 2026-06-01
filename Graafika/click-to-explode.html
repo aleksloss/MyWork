@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Click to Explode</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #0a0a0a;
+      cursor: crosshair;
+    }
+    canvas {
+      display: block;
+    }
+    .info {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      right: 16px;
+      text-align: center;
+      color: #fff;
+      font-family: Inter, system-ui, sans-serif;
+      font-size: 0.95rem;
+      opacity: 0.8;
+      z-index: 1;
+    }
+  </style>
+</head>
+<body>
+  <div class="info">Click anywhere to create an explosion of flying circles.</div>
+  <canvas id="explodeCanvas"></canvas>
+  <script>
+    const canvas = document.getElementById('explodeCanvas');
+    const ctx = canvas.getContext('2d');
+    const particles = [];
+
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    window.addEventListener('resize', resize);
+    resize();
+
+    function randomBetween(min, max) {
+      return Math.random() * (max - min) + min;
+    }
+
+    function createExplosion(x, y) {
+      const count = 12 + Math.floor(Math.random() * 8);
+      for (let i = 0; i < count; i += 1) {
+        const angle = (Math.PI * 2 * i) / count + randomBetween(-0.3, 0.3);
+        const speed = randomBetween(4, 12);
+        particles.push({
+          x,
+          y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          size: randomBetween(8, 20),
+          hue: randomBetween(0, 360),
+          alpha: 1,
+          life: randomBetween(60, 120)
+        });
+      }
+    }
+
+    canvas.addEventListener('click', event => {
+      createExplosion(event.clientX, event.clientY);
+    });
+
+    function animate() {
+      ctx.fillStyle = 'rgba(10, 10, 10, 0.05)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      for (let i = particles.length - 1; i >= 0; i -= 1) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.15; // gravity
+        p.alpha -= 0.01;
+        p.life -= 1;
+
+        if (p.alpha <= 0 || p.life <= 0) {
+          particles.splice(i, 1);
+          continue;
+        }
+
+        ctx.save();
+        ctx.globalAlpha = p.alpha;
+        ctx.fillStyle = `hsl(${p.hue}, 85%, 60%)`;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+  </script>
+</body>
+</html>

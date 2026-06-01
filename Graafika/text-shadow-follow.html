@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Text Shadow Follow</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: 'Inter', system-ui, sans-serif;
+      background: radial-gradient(circle at top left, rgba(70, 130, 255, 0.18), transparent 25%),
+                  radial-gradient(circle at bottom right, rgba(175, 88, 255, 0.16), transparent 24%),
+                  #0a1120;
+      color: #f8fbff;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 2rem;
+    }
+
+    .panel {
+      width: min(100%, 960px);
+      padding: 2rem;
+      border-radius: 32px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 40px 90px rgba(0, 0, 0, 0.22);
+    }
+
+    .title-row {
+      display: grid;
+      gap: 1.5rem;
+    }
+
+    .follow-title {
+      margin: 0;
+      font-size: clamp(2rem, 4vw, 4.5rem);
+      letter-spacing: -0.06em;
+      transition: text-shadow 0.08s ease;
+      text-shadow: 0px 0px 12px rgba(23, 34, 66, 0.45);
+    }
+
+    .subtitle {
+      margin: 1rem 0 0;
+      font-size: 1.05rem;
+      color: rgba(248, 251, 255, 0.78);
+      line-height: 1.8;
+    }
+
+    .hint {
+      margin-top: 2rem;
+      color: rgba(248, 251, 255, 0.68);
+      font-size: 0.95rem;
+      line-height: 1.75;
+    }
+  </style>
+</head>
+<body>
+  <div class="panel">
+    <div class="title-row">
+      <h1 class="follow-title">Text Shadow Follow</h1>
+      <h2 class="follow-title">Where there is a mouse, there is the sun.</h2>
+      <h3 class="follow-title">Shadows point away from the cursor.</h3>
+    </div>
+    <p class="subtitle">Move your pointer across the page to make the headings cast shadows in the opposite direction, creating dynamic depth and a subtle light-following effect.</p>
+    <p class="hint">Each heading calculates the cursor offset from its center and updates its text shadow so the shadow always appears on the far side.</p>
+  </div>
+
+  <script>
+    const titleElements = Array.from(document.querySelectorAll('.follow-title'));
+
+    function resetShadows() {
+      titleElements.forEach((title) => {
+        title.style.textShadow = '0px 0px 12px rgba(23, 34, 66, 0.45)';
+      });
+    }
+
+    function updateShadow(event) {
+      const x = event.clientX;
+      const y = event.clientY;
+
+      titleElements.forEach((title) => {
+        const rect = title.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+
+        const offsetX = centerX - x;
+        const offsetY = centerY - y;
+        const distance = Math.sqrt(offsetX * offsetX + offsetY * offsetY);
+        const strength = Math.min(24, Math.max(10, distance / 16));
+
+        const shadowX = Math.round((offsetX / (distance || 1)) * strength);
+        const shadowY = Math.round((offsetY / (distance || 1)) * strength);
+
+        title.style.textShadow = `${shadowX}px ${shadowY}px 18px rgba(8, 15, 38, 0.42), ${shadowX * 0.3}px ${shadowY * 0.3}px 30px rgba(106, 151, 255, 0.24)`;
+      });
+    }
+
+    document.addEventListener('pointermove', updateShadow);
+    document.addEventListener('pointerleave', resetShadows);
+    document.addEventListener('mouseout', (event) => {
+      if (!event.relatedTarget) resetShadows();
+    });
+  </script>
+</body>
+</html>

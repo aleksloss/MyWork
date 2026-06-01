@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Motion Soundscape</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="app">
+    <header class="header">
+      <div class="header-title-row">
+        <h1>Motion Soundscape</h1>
+        <a href="/" class="portfolio-link">Portfolio Home</a>
+      </div>
+      <div>
+        <button id="diagnosticsToggle" class="icon-btn">🛠️</button>
+        <button id="settingsToggle" class="icon-btn">⚙️</button>
+      </div>
+    </header>
+    <p class="hint">Start the camera and move an object left, right, up or down to play sounds.</p>
+
+    <section class="camera-box" id="cameraBox">
+      <video id="video" autoplay playsinline muted></video>
+      <canvas id="canvas"></canvas>
+      <div id="overlay" class="overlay"></div>
+      <div class="direction-indicator" id="directionIndicator">—</div>
+      <div id="direction" class="direction">No movement yet</div>
+    </section>
+
+    <div id="diagPanel" class="diag-panel" aria-hidden="true">
+      <div class="diag-header">
+        <strong>Diagnostics</strong>
+        <div class="diag-actions">
+          <button id="diagClear">Clear</button>
+          <button id="diagExport">Export</button>
+          <button id="diagClose">Close</button>
+        </div>
+      </div>
+      <div id="diagLog" class="diag-log"></div>
+    </div>
+
+    <section class="controls">
+      <button id="startBtn">Start Camera</button>
+      <button id="stopBtn">Stop Sounds</button>
+      <button id="securityToggle">Security Mode OFF</button>
+    </section>
+
+    <section class="status-bar">
+      <div id="securityStatus" class="security-status">Ready</div>
+      <div id="activeDisplay" class="active-display" aria-live="polite">
+        <div id="activeSwatch" class="active-swatch" title="Active color"></div>
+        <div id="activeDirection" class="active-direction">No movement</div>
+      </div>
+    </section>
+
+    <section class="stats-dashboard">
+      <h3>Movement Statistics</h3>
+      <div class="stats-grid">
+        <div class="stat-card stat-total">
+          <div class="stat-label">Total Movements</div>
+          <div class="stat-number" id="totalCount">0</div>
+          <div class="stat-bar">
+            <div class="stat-bar-fill" id="totalBar" style="width: 0%"></div>
+          </div>
+        </div>
+        <div class="stat-card stat-left">
+          <div class="stat-label">Left</div>
+          <div class="stat-number" id="leftCount">0</div>
+          <div class="stat-bar">
+            <div class="stat-bar-fill" id="leftBar" style="width: 0%"></div>
+          </div>
+        </div>
+        <div class="stat-card stat-back">
+          <div class="stat-label">Backward</div>
+          <div class="stat-number" id="backCount">0</div>
+          <div class="stat-bar">
+            <div class="stat-bar-fill" id="backBar" style="width: 0%"></div>
+          </div>
+        </div>
+        <div class="stat-card stat-right">
+          <div class="stat-label">Right</div>
+          <div class="stat-number" id="rightCount">0</div>
+          <div class="stat-bar">
+            <div class="stat-bar-fill" id="rightBar" style="width: 0%"></div>
+          </div>
+        </div>
+        <div class="stat-card stat-up">
+          <div class="stat-label">Up</div>
+          <div class="stat-number" id="upCount">0</div>
+          <div class="stat-bar">
+            <div class="stat-bar-fill" id="upBar" style="width: 0%"></div>
+          </div>
+        </div>
+        <div class="stat-card stat-down">
+          <div class="stat-label">Down</div>
+          <div class="stat-number" id="downCount">0</div>
+          <div class="stat-bar">
+            <div class="stat-bar-fill" id="downBar" style="width: 0%"></div>
+          </div>
+        </div>
+      </div>
+      <button id="resetStats" class="reset-btn">Reset Statistics</button>
+    </section>
+
+    <section id="historySection" class="history-section">
+      <h3>Movement History</h3>
+      <div class="history-controls">
+        <label>Filter by: 
+          <select id="historyFilter">
+            <option value="all">All Events</option>
+            <option value="left">Left</option>
+            <option value="right">Right</option>
+            <option value="up">Up</option>
+            <option value="down">Down</option>
+            <option value="back">Backward</option>
+            <option value="alarm">Security Alarm</option>
+          </select>
+        </label>
+      </div>
+      <div id="historyLog" class="history-log"></div>
+      <div class="history-actions">
+        <button id="clearHistory">Clear History</button>
+        <button id="exportHistory">Export as Text</button>
+      </div>
+    </section>
+
+    <section class="sound-settings" id="settings" aria-hidden="true">
+      <h2>Upload custom sounds</h2>
+      <p class="small">If you don't upload sounds, built-in defaults will play.</p>
+      <label>Left (laser): <input type="file" id="soundLeft" accept="audio/*"></label>
+      <label>Right (engine): <input type="file" id="soundRight" accept="audio/*"></label>
+      <label>Up (rocket): <input type="file" id="soundUp" accept="audio/*"></label>
+      <label>Down (siren): <input type="file" id="soundDown" accept="audio/*"></label>
+      <div class="settings-actions">
+        <button id="resetSounds">Reset Uploads</button>
+        <button id="closeSettings" class="muted">Close</button>
+      </div>
+
+      <hr />
+      <h3>Color Customization</h3>
+      <div class="color-settings">
+        <label>Left color: <input type="color" id="colorLeft" value="#0066ff"></label>
+        <label>Right color: <input type="color" id="colorRight" value="#ff9900"></label>
+        <label>Up color: <input type="color" id="colorUp" value="#00cc00"></label>
+        <label>Down color: <input type="color" id="colorDown" value="#ff0000"></label>
+        <button id="resetColors">Reset Colors</button>
+      </div>
+      <hr />
+      <h3>Voice feedback</h3>
+      <label><input type="checkbox" id="voiceEnable" checked> Enable voice feedback</label>
+      <label>Speech volume: <span id="voiceVolumeLabel">90%</span>
+        <input type="range" id="voiceVolume" min="0" max="1" step="0.01" value="0.9">
+      </label>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

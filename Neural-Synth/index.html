@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Neon Brush Canvas</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="toolbar">
+    <div class="control-group">
+      <label class="color-label">Brush <input type="color" id="colorPicker" value="#ff0044"></label>
+      <button id="modeBtn" title="Toggle brush mode">Solid</button>
+      <button id="symmetryBtn" title="Toggle symmetry mode">Symmetry</button>
+      <button id="recordBtn" title="Record and loop your strokes">Record</button>
+      <button id="soundBtn" title="Toggle sound">Sound: On</button>
+    </div>
+    <div class="control-group">
+      <button id="cleanBtn" title="Clear canvas">Clean</button>
+      <button id="magicBtn" title="Magic Tablet: scatter and clear">Magic</button>
+    </div>
+  </div>
+  <canvas id="drawCanvas"></canvas>
+  <script src="app.js"></script>
+</body>
+</html>

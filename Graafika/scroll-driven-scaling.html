@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Scroll-Driven Scaling</title>
+  <style>
+    html {
+      scroll-behavior: smooth;
+    }
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      overflow-x: hidden;
+    }
+    .section {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .scale-element {
+      transition: transform 0.1s ease-out;
+      will-change: transform;
+    }
+    .circle {
+      width: 120px;
+      height: 120px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      backdrop-filter: blur(10px);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+    .square {
+      width: 100px;
+      height: 100px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+    }
+    .text-block {
+      max-width: 600px;
+      text-align: center;
+      padding: 2rem;
+      background: rgba(0, 0, 0, 0.1);
+      border-radius: 20px;
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .text-block h2 {
+      margin: 0 0 1rem;
+      font-size: 2.5rem;
+      letter-spacing: -0.02em;
+    }
+    .text-block p {
+      margin: 0;
+      line-height: 1.6;
+      opacity: 0.9;
+    }
+    .floating-elements {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+    .floating-elements > div {
+      position: absolute;
+    }
+  </style>
+</head>
+<body>
+  <div class="section">
+    <div class="text-block scale-element">
+      <h2>Scroll to Scale</h2>
+      <p>Watch the elements grow and shrink as you scroll through the page.</p>
+    </div>
+    <div class="floating-elements">
+      <div class="circle scale-element" style="top: 20%; left: 10%;">1</div>
+      <div class="square scale-element" style="top: 60%; right: 15%;">A</div>
+      <div class="circle scale-element" style="bottom: 30%; left: 20%;">2</div>
+      <div class="square scale-element" style="top: 40%; right: 25%;">B</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="text-block scale-element">
+      <h2>Keep Scrolling</h2>
+      <p>The scaling continues with different patterns for each element.</p>
+    </div>
+    <div class="floating-elements">
+      <div class="circle scale-element" style="top: 15%; left: 70%;">3</div>
+      <div class="square scale-element" style="bottom: 50%; right: 10%;">C</div>
+      <div class="circle scale-element" style="top: 70%; left: 30%;">4</div>
+      <div class="square scale-element" style="bottom: 20%; right: 40%;">D</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="text-block scale-element">
+      <h2>End of the Journey</h2>
+      <p>Scroll back up to see the reverse scaling effect.</p>
+    </div>
+    <div class="floating-elements">
+      <div class="circle scale-element" style="top: 25%; left: 50%;">5</div>
+      <div class="square scale-element" style="bottom: 35%; left: 15%;">E</div>
+      <div class="circle scale-element" style="top: 55%; right: 30%;">6</div>
+      <div class="square scale-element" style="bottom: 15%; right: 50%;">F</div>
+    </div>
+  </div>
+
+  <script>
+    const scaleElements = document.querySelectorAll('.scale-element');
+    const totalHeight = document.body.scrollHeight - window.innerHeight;
+
+    function updateScales() {
+      const scrollTop = window.pageYOffset;
+      const progress = Math.min(scrollTop / totalHeight, 1);
+
+      scaleElements.forEach((el, index) => {
+        const baseScale = index % 2 === 0 ? 0.5 : 1.5; // alternate between shrinking and growing
+        const scaleRange = index % 2 === 0 ? 1 : 0.5;
+        const scale = baseScale + (scaleRange - baseScale) * progress;
+        el.style.transform = `scale(${scale})`;
+      });
+    }
+
+    window.addEventListener('scroll', updateScales);
+    updateScales(); // initial call
+  </script>
+</body>
+</html>

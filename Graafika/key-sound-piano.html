@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Key-Sound Piano</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: 'Inter', system-ui, sans-serif;
+      background: radial-gradient(circle at top left, rgba(55, 144, 255, 0.22), transparent 22%),
+                  radial-gradient(circle at bottom right, rgba(255, 117, 196, 0.18), transparent 20%),
+                  #0f1221;
+      color: #eef4ff;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 2rem;
+    }
+
+    .container {
+      width: min(100%, 960px);
+      display: grid;
+      gap: 1.5rem;
+      text-align: center;
+    }
+
+    .panel {
+      padding: 2rem;
+      border-radius: 32px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      box-shadow: 0 40px 100px rgba(0, 0, 0, 0.18);
+      backdrop-filter: blur(18px);
+    }
+
+    h1 {
+      margin: 0 0 0.75rem;
+      font-size: clamp(2rem, 3vw, 3.2rem);
+      letter-spacing: -0.05em;
+    }
+
+    p {
+      margin: 0;
+      color: rgba(238, 244, 255, 0.82);
+      line-height: 1.8;
+      font-size: 1rem;
+    }
+
+    .keyboard {
+      display: grid;
+      grid-template-columns: repeat(10, 1fr);
+      gap: 0.9rem;
+      margin-top: 1.5rem;
+    }
+
+    .key {
+      padding: 1rem 0.5rem;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #eef4ff;
+      box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.14);
+      transition: transform 0.18s ease, background 0.18s ease;
+      user-select: none;
+    }
+
+    .key.active {
+      transform: translateY(2px);
+      background: rgba(92, 189, 255, 0.24);
+      border-color: rgba(255, 255, 255, 0.18);
+    }
+
+    .input-area {
+      width: 100%;
+      min-height: 140px;
+      padding: 1.25rem 1rem;
+      margin-top: 1.5rem;
+      border-radius: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(12, 18, 42, 0.9);
+      color: #eef4ff;
+      font-size: 1.05rem;
+      line-height: 1.7;
+      resize: vertical;
+      outline: none;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+    }
+
+    .note {
+      margin-top: 1rem;
+      font-size: 0.95rem;
+      color: rgba(238, 244, 255, 0.72);
+      line-height: 1.75;
+    }
+
+    @media (max-width: 680px) {
+      .keyboard {
+        grid-template-columns: repeat(5, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="panel">
+      <h1>Key-Sound Piano</h1>
+      <p>Type in the box below and each keystroke will play a short randomized sound from chiptune blips to playful "piu" effects.</p>
+      <div class="keyboard" id="keyboard"></div>
+      <textarea class="input-area" id="inputArea" placeholder="Start typing to hear notes..." autofocus></textarea>
+      <p class="note">The sound is triggered on every keydown event. If audio is muted, click once in the page to activate sound permissions.</p>
+    </div>
+  </div>
+
+  <script>
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const inputArea = document.getElementById('inputArea');
+    const keyboard = document.getElementById('keyboard');
+    const keyLabels = ['Q','W','E','R','T','Y','U','I','O','P'];
+    const activeKeys = new Map();
+
+    const toneMap = {
+      default: 0,
+      bright: 1,
+      bit: 2,
+      pluck: 3,
+      piu: 4
+    };
+
+    function playKeySound(char) {
+      if (audioContext.state === 'suspended') {
+        audioContext.resume();
+      }
+
+      const now = audioContext.currentTime;
+      const oscillator = audioContext.createOscillator();
+      const gain = audioContext.createGain();
+      const filter = audioContext.createBiquadFilter();
+
+      const baseFrequency = 180 + (Math.random() * 200);
+      const noteFrequency = baseFrequency * Math.pow(2, (char.charCodeAt(0) % 12 - 9) / 12);
+      const waveTypes = ['square', 'triangle', 'sawtooth', 'sine'];
+      const waveType = waveTypes[Math.floor(Math.random() * waveTypes.length)];
+      oscillator.type = waveType;
+      oscillator.frequency.setValueAtTime(noteFrequency, now);
+
+      filter.type = Math.random() > 0.6 ? 'lowpass' : 'bandpass';
+      filter.frequency.setValueAtTime(700 + Math.random() * 1500, now);
+      filter.Q.setValueAtTime(2 + Math.random() * 10, now);
+
+      gain.gain.setValueAtTime(0, now);
+      gain.gain.linearRampToValueAtTime(0.22 + Math.random() * 0.15, now + 0.006);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.18 + Math.random() * 0.18);
+
+      oscillator.connect(filter);
+      filter.connect(gain);
+      gain.connect(audioContext.destination);
+
+      oscillator.start(now);
+      oscillator.stop(now + 0.22 + Math.random() * 0.15);
+    }
+
+    function flashKey(keyName) {
+      const key = Array.from(keyboard.children).find((btn) => btn.textContent === keyName.toUpperCase());
+      if (!key) return;
+      key.classList.add('active');
+      clearTimeout(activeKeys.get(keyName));
+      const timeoutId = setTimeout(() => key.classList.remove('active'), 120);
+      activeKeys.set(keyName, timeoutId);
+    }
+
+    function handleKeyDown(event) {
+      if (event.key.length !== 1) return;
+      playKeySound(event.key);
+      flashKey(event.key);
+    }
+
+    keyLabels.forEach((label) => {
+      const key = document.createElement('div');
+      key.className = 'key';
+      key.textContent = label;
+      keyboard.appendChild(key);
+    });
+
+    window.addEventListener('keydown', handleKeyDown);
+    inputArea.addEventListener('focus', () => {
+      if (audioContext.state === 'suspended') audioContext.resume();
+    });
+  </script>
+</body>
+</html>

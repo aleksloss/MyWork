@@ -1,0 +1,70 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+html, body {
+  width: 100%;
+  height: 100%;
+}
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #121212;
+  color: #ffffff;
+  font-family: Arial, sans-serif;
+}
+.game-shell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+.canvas-wrapper {
+  position: relative;
+  width: min(100vw - 40px, calc((100vh - 40px) * 4 / 3));
+  max-width: 1000px;
+  aspect-ratio: 4 / 3;
+  max-height: calc(100vh - 40px);
+}
+canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: #1e1e1e;
+  border: 2px solid #333;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.6);
+}
+#playerIcon {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translate(-50%, -50%) rotate(0deg);
+  font-size: 28px;
+  line-height: 1;
+  color: #4caf50;
+  pointer-events: none;
+  display: none;
+  font-style: normal;
+  text-align: center;
+}
+.enemyIcon {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: translate(-50%, -50%);
+  font-size: 26px;
+  line-height: 1;
+  color: #e53935;
+  pointer-events: none;
+}
+.fi.fi-sr-user::before {
+  content: '👤';
+  color: #4caf50;
+}
+.fi.fi-sc-snake::before {
+  content: '🐍';
+  color: #e53935;
+}

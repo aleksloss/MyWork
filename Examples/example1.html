@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Programming Excuse Generator</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #05060b;
+      color: #e5e9f0;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      min-height: 100%;
+    }
+
+    body {
+      margin: 0;
+      display: grid;
+      place-items: center;
+      padding: 2rem;
+      background: radial-gradient(circle at top left, rgba(82, 89, 255, 0.25), transparent 30%),
+                  radial-gradient(circle at bottom right, rgba(255, 126, 95, 0.18), transparent 30%),
+                  #05060b;
+    }
+
+    .page-shell {
+      width: min(100%, 720px);
+    }
+
+    .card {
+      background: rgba(10, 12, 21, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 32px;
+      padding: 2rem;
+      box-shadow: 0 32px 90px rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(18px);
+    }
+
+    header {
+      margin-bottom: 1.5rem;
+    }
+
+    .subtitle {
+      margin: 0 0 0.75rem;
+      color: #7c82aa;
+      text-transform: uppercase;
+      letter-spacing: 0.22em;
+      font-size: 0.75rem;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      line-height: 1.05;
+    }
+
+    .excuse-shell {
+      min-height: 160px;
+      display: grid;
+      place-items: center;
+      padding: 1.75rem 1.5rem;
+      margin-bottom: 1.75rem;
+      background: linear-gradient(180deg, rgba(66, 67, 97, 0.24), rgba(0, 0, 0, 0.2));
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 26px;
+    }
+
+    .excuse-text {
+      margin: 0;
+      text-align: center;
+      font-size: clamp(1.05rem, 1.5vw, 1.35rem);
+      line-height: 1.6;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: textAppear 0.75s ease forwards;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.85rem;
+      justify-content: center;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 999px;
+      padding: 0.95rem 1.6rem;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #8057ff, #33d5ff);
+      color: #0b0f21;
+      box-shadow: 0 16px 30px rgba(51, 213, 255, 0.18);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.06);
+      color: #e5e9f0;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+    }
+
+    footer {
+      margin-top: 1.5rem;
+      text-align: center;
+      color: #8c94b3;
+      font-size: 0.9rem;
+    }
+
+    @keyframes textAppear {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes flash {
+      0%, 100% { background-color: rgba(255,255,255,0.08); }
+      50% { background-color: rgba(255,255,255,0.18); }
+    }
+
+    .excuse-text.flash {
+      animation: textAppear 0.5s ease forwards, flash 0.7s ease;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-shell">
+    <div class="card">
+      <header>
+        <p class="subtitle">Absurd Programming Excuse Generator</p>
+        <h1>My Broken Code Didn’t Do It</h1>
+      </header>
+
+      <div class="excuse-shell">
+        <p class="excuse-text" id="excuseText">Press generate and witness the ridiculousness.</p>
+      </div>
+
+      <div class="controls">
+        <button id="generateBtn" class="btn btn-primary">Generate again</button>
+        <button id="copyBtn" class="btn btn-secondary">Copy to clipboard</button>
+      </div>
+
+      <footer>
+        <p>Powered by random absurdity and browser magic.</p>
+      </footer>
+    </div>
+  </div>
+
+  <script>
+    const excuseText = document.getElementById('excuseText');
+    const generateBtn = document.getElementById('generateBtn');
+    const copyBtn = document.getElementById('copyBtn');
+
+    const subjects = [
+      'My compiler',
+      'The code review',
+      'A rogue semicolon',
+      'The CI pipeline',
+      'The production server',
+      'My pair programmer',
+      'The IDE',
+      'The deployment script',
+      'The QA bot',
+      'The cloud provider'
+    ];
+
+    const actions = [
+      'refused to initialize',
+      'started a dance routine',
+      'misplaced the array',
+      'forgot how to parse JSON',
+      'thought it was a good idea to sleep',
+      'decided to spawn ninja threads',
+      'entered a parallel universe',
+      'returned a 404 on purpose',
+      'chose recursion over reality',
+      'swapped the keyboard layout'
+    ];
+
+    const reasons = [
+      'because it was Friday',
+      'after eating too much coffee',
+      'while trying to impress the browser',
+      'since the deadline whispered',
+      'during a spontaneous refactor',
+      'because the universe demanded a reboot',
+      'with an attitude of pure chaos',
+      'until the stack overflowed emotionally',
+      'to avoid unit tests',
+      'until the debugger cried'
+    ];
+
+    const extras = [
+      'and now everything is on fire.',
+      'so the commit message is now "sorry".',
+      'but it still passed on my machine.',
+      'and no one can explain why.',
+      'so I blamed the keyboard.',
+      'and the console laughed at me.',
+      'but at least the emoji worked.',
+      'so the bug became a feature.',
+      'and the stack trace looked fashionable.',
+      'now it only compiles at midnight.'
+    ];
+
+    function randomItem(list) {
+      return list[Math.floor(Math.random() * list.length)];
+    }
+
+    function generateExcuse() {
+      const excuse = `${randomItem(subjects)} ${randomItem(actions)} ${randomItem(reasons)} ${randomItem(extras)}`;
+      excuseText.textContent = excuse;
+      excuseText.classList.remove('flash');
+      void excuseText.offsetWidth;
+      excuseText.classList.add('flash');
+    }
+
+    async function copyExcuse() {
+      const text = excuseText.textContent.trim();
+      try {
+        await navigator.clipboard.writeText(text);
+        copyBtn.textContent = 'Copied!';
+      } catch (err) {
+        copyBtn.textContent = 'Copy failed';
+      } finally {
+        setTimeout(() => { copyBtn.textContent = 'Copy to clipboard'; }, 1500);
+      }
+    }
+
+    generateBtn.addEventListener('click', generateExcuse);
+    copyBtn.addEventListener('click', copyExcuse);
+    window.addEventListener('load', () => { setTimeout(generateExcuse, 250); });
+  </script>
+</body>
+</html>

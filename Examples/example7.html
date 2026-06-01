@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Password Strength Checker</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f6fb;
+      color: #20232a;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      width: min(500px, 90%);
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 16px 40px rgba(20, 30, 70, 0.12);
+      padding: 32px;
+    }
+
+    h1 {
+      margin: 0 0 18px;
+      font-size: 1.75rem;
+      letter-spacing: -0.02em;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    input[type="password"] {
+      width: 100%;
+      padding: 14px 16px;
+      border: 1px solid #d8dde6;
+      border-radius: 12px;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+
+    input[type="password"]:focus {
+      border-color: #5a7cff;
+      box-shadow: 0 0 0 3px rgba(90, 124, 255, 0.12);
+    }
+
+    .strength-meter {
+      margin-top: 20px;
+    }
+
+    .strength-bar {
+      width: 100%;
+      height: 14px;
+      border-radius: 999px;
+      background: #e7eaf1;
+      overflow: hidden;
+    }
+
+    .strength-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: 999px;
+      transition: width 0.3s ease, background 0.3s ease;
+    }
+
+    .strength-label {
+      margin-top: 10px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.95rem;
+      color: #5c6b82;
+    }
+
+    .criteria {
+      margin-top: 24px;
+      list-style: none;
+      padding: 0;
+      display: grid;
+      gap: 10px;
+    }
+
+    .criteria li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      background: #f8f9fd;
+      border-radius: 12px;
+      color: #556077;
+    }
+
+    .criteria li span {
+      display: inline-flex;
+      width: 22px;
+      height: 22px;
+      justify-content: center;
+      align-items: center;
+      border-radius: 50%;
+      background: #dbe1f4;
+      color: #3354c7;
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    .criteria li.valid {
+      background: #e9fbef;
+      color: #1f5d2e;
+    }
+
+    .criteria li.valid span {
+      background: #c8f0d3;
+      color: #1f7b38;
+    }
+
+    .hint {
+      margin-top: 18px;
+      font-size: 0.95rem;
+      color: #414a5f;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Password Strength Checker</h1>
+    <label for="password">Enter a password</label>
+    <input id="password" type="password" placeholder="Type your password...">
+
+    <div class="strength-meter">
+      <div class="strength-bar">
+        <div id="strengthFill" class="strength-fill"></div>
+      </div>
+      <div class="strength-label">
+        <span id="strengthText">Strength: Very Weak</span>
+        <span id="strengthScore">0 / 100</span>
+      </div>
+    </div>
+
+    <ul class="criteria">
+      <li id="lengthCriteria"><span>1</span> At least 8 characters</li>
+      <li id="caseCriteria"><span>2</span> Uppercase and lowercase letters</li>
+      <li id="numberCriteria"><span>3</span> At least one number</li>
+      <li id="symbolCriteria"><span>4</span> At least one symbol</li>
+    </ul>
+
+    <p class="hint">Try combining length, mixed letters, numbers, and symbols for a stronger password.</p>
+  </div>
+
+  <script>
+    const passwordInput = document.getElementById('password');
+    const strengthFill = document.getElementById('strengthFill');
+    const strengthText = document.getElementById('strengthText');
+    const strengthScore = document.getElementById('strengthScore');
+
+    const lengthCriteria = document.getElementById('lengthCriteria');
+    const caseCriteria = document.getElementById('caseCriteria');
+    const numberCriteria = document.getElementById('numberCriteria');
+    const symbolCriteria = document.getElementById('symbolCriteria');
+
+    function evaluatePassword(password) {
+      const criteria = {
+        length: password.length >= 8,
+        case: /[a-z]/.test(password) && /[A-Z]/.test(password),
+        number: /[0-9]/.test(password),
+        symbol: /[!@#\$%\^&\*\(\)\[\]\{\};:'"\\|,<\.>\/?`~\-=_+]/.test(password)
+      };
+
+      let score = 0;
+      if (criteria.length) score += 30;
+      if (criteria.case) score += 25;
+      if (criteria.number) score += 20;
+      if (criteria.symbol) score += 25;
+
+      if (password.length >= 12) score += 5;
+      if (password.length >= 16) score += 5;
+      if (score > 100) score = 100;
+
+      return { criteria, score };
+    }
+
+    function updateStrength() {
+      const password = passwordInput.value;
+      const { criteria, score } = evaluatePassword(password);
+
+      lengthCriteria.classList.toggle('valid', criteria.length);
+      caseCriteria.classList.toggle('valid', criteria.case);
+      numberCriteria.classList.toggle('valid', criteria.number);
+      symbolCriteria.classList.toggle('valid', criteria.symbol);
+
+      strengthScore.textContent = `${score} / 100`;
+
+      let label = 'Very Weak';
+      let color = '#ff4d4f';
+      let width = Math.min(score, 100);
+
+      if (score >= 85) {
+        label = 'Very Strong';
+        color = '#2eb85c';
+      } else if (score >= 65) {
+        label = 'Strong';
+        color = '#4ab88a';
+      } else if (score >= 45) {
+        label = 'Medium';
+        color = '#f0ad4e';
+      } else if (score >= 25) {
+        label = 'Weak';
+        color = '#ff8c4d';
+      }
+
+      if (!password) {
+        width = 0;
+        label = 'Very Weak';
+        color = '#d1d8e4';
+      }
+
+      strengthFill.style.width = width + '%';
+      strengthFill.style.background = color;
+      strengthText.textContent = `Strength: ${label}`;
+    }
+
+    passwordInput.addEventListener('input', updateStrength);
+  </script>
+</body>
+</html>

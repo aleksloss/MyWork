@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Auto-Chaos Rotation</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: 'Inter', system-ui, sans-serif;
+      background: radial-gradient(circle at 20% 25%, rgba(81, 132, 255, 0.22), transparent 24%),
+                  radial-gradient(circle at 80% 20%, rgba(255, 119, 164, 0.18), transparent 20%),
+                  radial-gradient(circle at 50% 90%, rgba(83, 255, 186, 0.18), transparent 28%),
+                  #08101f;
+      color: #e8eefb;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .wrapper {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 2rem;
+      width: min(1200px, 100%);
+      animation: wrapper-rotate 140s linear infinite;
+    }
+
+    .panel {
+      position: relative;
+      min-height: 220px;
+      border-radius: 28px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 40px 100px rgba(0, 0, 0, 0.25);
+      overflow: hidden;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      backdrop-filter: blur(18px);
+      transform-origin: center center;
+      animation: panel-rotate 52s linear infinite;
+    }
+
+    .panel:nth-child(1) {
+      animation-duration: 58s;
+    }
+
+    .panel:nth-child(2) {
+      animation-duration: 46s;
+    }
+
+    .panel:nth-child(3) {
+      animation-duration: 36s;
+    }
+
+    .panel::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top left, rgba(255, 255, 255, 0.14), transparent 26%);
+      pointer-events: none;
+      opacity: 0.9;
+    }
+
+    .panel-content {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      gap: 1rem;
+    }
+
+    .panel h2 {
+      margin: 0;
+      font-size: clamp(1.3rem, 2vw, 1.8rem);
+      letter-spacing: -0.02em;
+    }
+
+    .panel p {
+      margin: 0;
+      color: rgba(232, 238, 251, 0.78);
+      line-height: 1.75;
+      font-size: 0.96rem;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 3rem;
+      height: 3rem;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #dbe6ff;
+      font-weight: 700;
+      font-size: 1rem;
+      user-select: none;
+      transform-origin: center center;
+      animation: badge-rotate 18s linear infinite;
+    }
+
+    .hint {
+      position: absolute;
+      left: 2rem;
+      right: 2rem;
+      bottom: 1rem;
+      color: rgba(232, 238, 251, 0.75);
+      font-size: 0.95rem;
+      line-height: 1.6;
+      z-index: 1;
+      text-align: center;
+      transform-origin: center center;
+      animation: hint-rotate 48s linear infinite;
+    }
+
+    .rotator {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      transform-style: preserve-3d;
+    }
+
+    .shape {
+      position: absolute;
+      width: 64px;
+      height: 64px;
+      border-radius: 16px;
+      opacity: 0.68;
+      box-shadow: 0 24px 80px rgba(11, 20, 48, 0.28);
+      filter: blur(0.2px);
+    }
+
+    .shape.circle {
+      border-radius: 50%;
+    }
+
+    .shape.triangle {
+      width: 0;
+      height: 0;
+      border-left: 32px solid transparent;
+      border-right: 32px solid transparent;
+      border-bottom: 56px solid rgba(255, 255, 255, 0.12);
+      background: none;
+      box-shadow: none;
+    }
+
+    .shape.x {
+      width: 20px;
+      height: 20px;
+      background: none;
+      box-shadow: none;
+    }
+
+    .shape.x::before,
+    .shape.x::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(255, 255, 255, 0.14);
+      transform-origin: center;
+    }
+
+    .shape.x::before {
+      transform: rotate(45deg);
+    }
+
+    .shape.x::after {
+      transform: rotate(-45deg);
+    }
+
+    .shape-1 { top: 24px; left: 22px; background: rgba(49, 154, 255, 0.28); animation: rotate-slow 32s linear infinite; }
+    .shape-2 { top: 50px; right: 18px; width: 48px; height: 48px; background: rgba(255, 110, 176, 0.22); animation: rotate-fast 18s linear infinite; }
+    .shape-3 { bottom: 40px; left: 16px; width: 72px; height: 72px; border-radius: 50%; background: rgba(80, 255, 206, 0.22); animation: rotate-medium 26s linear infinite; }
+    .shape-4 { bottom: 30px; right: 44px; background: rgba(178, 121, 255, 0.24); animation: rotate-slower 40s linear infinite; }
+    .shape-5 { top: 38%; left: 38%; width: 24px; height: 24px; background: rgba(255, 255, 255, 0.16); animation: rotate-fast 19s linear infinite; }
+    .shape-6 { top: 14%; right: 22%; width: 88px; height: 88px; border-radius: 32px; background: rgba(120, 203, 255, 0.14); animation: rotate-slow 36s linear infinite; }
+
+    @keyframes rotate-slow {
+      from { transform: rotate(0deg) translateZ(0px); }
+      to { transform: rotate(360deg) translateZ(0px); }
+    }
+
+    @keyframes rotate-medium {
+      from { transform: rotate(0deg) translateZ(0px); }
+      to { transform: rotate(-360deg) translateZ(0px); }
+    }
+
+    @keyframes rotate-fast {
+      from { transform: rotate(0deg) translateZ(0px); }
+      to { transform: rotate(360deg) translateZ(0px); }
+    }
+
+    @keyframes rotate-slower {
+      from { transform: rotate(0deg) translateZ(0px); }
+      to { transform: rotate(-360deg) translateZ(0px); }
+    }
+
+    @keyframes panel-rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes badge-rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(-360deg); }
+    }
+
+    @keyframes hint-rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes wrapper-rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(-360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="panel">
+      <div class="rotator shape shape-1"></div>
+      <div class="rotator shape shape-2"></div>
+      <div class="rotator shape shape-3"></div>
+      <div class="rotator shape shape-4"></div>
+      <div class="rotator shape shape-5"></div>
+      <div class="rotator shape shape-6"></div>
+      <div class="panel-content">
+        <h2>Auto-Chaos Rotation</h2>
+        <p>Each card and floating shape rotates at a different speed, creating a dynamic, floating interface with slow, smooth motion.</p>
+      </div>
+      <div class="badge">01</div>
+    </div>
+    <div class="panel">
+      <div class="rotator shape shape-2"></div>
+      <div class="rotator shape shape-4"></div>
+      <div class="rotator shape shape-1"></div>
+      <div class="rotator shape shape-3"></div>
+      <div class="panel-content">
+        <h2>Soft Spin Animation</h2>
+        <p>The motions are subtle enough to feel calm, while each element floats independently for a lively result.</p>
+      </div>
+      <div class="badge">02</div>
+    </div>
+    <div class="panel">
+      <div class="rotator shape shape-3"></div>
+      <div class="rotator shape shape-5"></div>
+      <div class="rotator shape shape-6"></div>
+      <div class="panel-content">
+        <h2>Layered Movement</h2>
+        <p>Different axis speeds and varied rotation directions keep the interface visually rich without overwhelming the content.</p>
+      </div>
+      <div class="badge">03</div>
+    </div>
+  </div>
+  <div class="hint">Watch the cards and shapes drift with gentle rotation to recreate a lively, floating user interface.</div>
+</body>
+</html>

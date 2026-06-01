@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hover Filter Swap</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: 'Inter', system-ui, sans-serif;
+      background: linear-gradient(135deg, #080b12 0%, #141e33 100%);
+      color: #f3f6ff;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .container {
+      width: min(100%, 960px);
+      display: grid;
+      gap: 1.5rem;
+      align-items: center;
+      justify-items: center;
+      text-align: center;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 720px;
+      border-radius: 32px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(16px);
+    }
+
+    .image-wrapper {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .image-wrapper::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top left, rgba(255, 255, 255, 0.12), transparent 36%);
+      pointer-events: none;
+    }
+
+    .image {
+      width: 100%;
+      display: block;
+      transition: filter 0.5s ease, transform 0.5s ease;
+      filter: grayscale(100%) contrast(1.1) brightness(0.88);
+      transform: scale(1);
+    }
+
+    .image-wrapper:hover .image {
+      filter: hue-rotate(225deg) saturate(2) contrast(1.1) brightness(1.05) drop-shadow(0 30px 42px rgba(46, 133, 255, 0.44));
+      transform: scale(1.02);
+    }
+
+    .content {
+      padding: 1.75rem 2rem 2rem;
+    }
+
+    h1 {
+      margin: 0 0 0.75rem;
+      font-size: clamp(2rem, 3vw, 3rem);
+      letter-spacing: -0.04em;
+    }
+
+    p {
+      margin: 0;
+      color: rgba(243, 246, 255, 0.78);
+      line-height: 1.8;
+      font-size: 1rem;
+    }
+
+    .hint {
+      max-width: 720px;
+      font-size: 0.95rem;
+      color: rgba(243, 246, 255, 0.75);
+      line-height: 1.75;
+    }
+
+    @media (max-width: 640px) {
+      .card {
+        border-radius: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="image-wrapper">
+        <img class="image" src="https://images.unsplash.com/photo-1518779578993-ec3579fee39f?auto=format&fit=crop&w=1200&q=80" alt="Futuristic landscape">
+      </div>
+      <div class="content">
+        <h1>Hover Filter Swap</h1>
+        <p>Move your mouse over the image to switch from a refined black-and-white look to a neon-tinted, high-contrast effect. The transition is smooth and polished.</p>
+      </div>
+    </div>
+    <div class="hint">Hover over the image to see the filter change from monochrome to bright neon glow.</div>
+  </div>
+</body>
+</html>

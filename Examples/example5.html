@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Phrase Generator</title>
+    <style>
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+            border: 1px solid #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+        button {
+            background-color: #6200ea;
+            color: #ffffff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #3700b3;
+        }
+        .phrase {
+            font-size: 24px;
+            margin: 20px 0;
+            opacity: 0;
+            transform: translateY(-20px);
+            animation: fadeIn 0.5s forwards;
+        }
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Random Corporate Boss Phrase Generator</h1>
+        <div class="phrase" id="phrase">Click the button to generate a phrase!</div>
+        <button id="generate">Generate Phrase</button>
+        <button id="copy">Copy to Clipboard</button>
+    </div>
+    <script>
+        const phrases = [
+            "Let's circle back on that.",
+            "I need you to take this offline.",
+            "We're not a family, we're a team.",
+            "Can we leverage synergies here?",
+            "I’m going to need you to be more proactive.",
+            "Let’s touch base later.",
+            "I think we need to pivot on this.",
+            "We need to think outside the box.",
+            "I’m going to need you to give 110%.",
+            "Let’s not boil the ocean."
+        ];
+
+        const phraseElement = document.getElementById('phrase');
+        const generateButton = document.getElementById('generate');
+        const copyButton = document.getElementById('copy');
+
+        generateButton.addEventListener('click', () => {
+            const randomIndex = Math.floor(Math.random() * phrases.length);
+            phraseElement.textContent = phrases[randomIndex];
+            phraseElement.style.animation = 'none'; // Reset animation
+            phraseElement.offsetHeight; // Trigger reflow
+            phraseElement.style.animation = '';
+        });
+
+        copyButton.addEventListener('click', () => {
+            navigator.clipboard.writeText(phraseElement.textContent)
+                .then(() => alert('Phrase copied to clipboard!'))
+                .catch(err => console.error('Error copying text: ', err));
+        });
+    </script>
+</body>
+</html>

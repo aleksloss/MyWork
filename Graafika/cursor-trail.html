@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cursor Trail</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #090b12;
+      cursor: none;
+    }
+    canvas {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="trailCanvas"></canvas>
+  <script>
+    const canvas = document.getElementById('trailCanvas');
+    const ctx = canvas.getContext('2d');
+    const particles = [];
+
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    window.addEventListener('resize', resize);
+    resize();
+
+    function randomBetween(min, max) {
+      return Math.random() * (max - min) + min;
+    }
+
+    function createParticle(x, y) {
+      particles.push({
+        x,
+        y,
+        size: randomBetween(6, 18),
+        hue: randomBetween(160, 260),
+        alpha: 1,
+        vx: randomBetween(-1.2, 1.2),
+        vy: randomBetween(-1.2, 1.2),
+        life: randomBetween(18, 28)
+      });
+    }
+
+    window.addEventListener('mousemove', (event) => {
+      const count = 4;
+      for (let i = 0; i < count; i += 1) {
+        createParticle(event.clientX + randomBetween(-8, 8), event.clientY + randomBetween(-8, 8));
+      }
+    });
+
+    function drawParticle(p) {
+      ctx.save();
+      ctx.globalAlpha = p.alpha;
+      ctx.fillStyle = `hsl(${p.hue}, 90%, 65%)`;
+      ctx.translate(p.x, p.y);
+      ctx.rotate((p.life / 30) * Math.PI);
+      ctx.beginPath();
+      ctx.moveTo(0, -p.size * 0.5);
+      ctx.lineTo(p.size * 0.4, p.size * 0.5);
+      ctx.lineTo(-p.size * 0.4, p.size * 0.5);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function animate() {
+      ctx.fillStyle = 'rgba(9, 11, 18, 0.18)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      for (let i = particles.length - 1; i >= 0; i -= 1) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.alpha -= 0.03;
+        p.life -= 1;
+
+        if (p.alpha <= 0 || p.life <= 0) {
+          particles.splice(i, 1);
+          continue;
+        }
+
+        drawParticle(p);
+      }
+
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+  </script>
+</body>
+</html>

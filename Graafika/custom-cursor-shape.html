@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Custom Cursor Shape</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: radial-gradient(circle at 50% 50%, #2c3e50 0%, #34495e 50%, #2c3e50 100%);
+      color: white;
+      font-family: Inter, system-ui, sans-serif;
+      cursor: none;
+    }
+    .container {
+      display: grid;
+      place-items: center;
+      min-height: 100vh;
+      padding: 2rem;
+      text-align: center;
+    }
+    h1 {
+      margin: 0 0 1rem;
+      font-size: 3rem;
+      letter-spacing: -0.02em;
+    }
+    p {
+      margin: 0;
+      font-size: 1.2rem;
+      opacity: 0.9;
+      max-width: 600px;
+    }
+    .custom-cursor {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 40px;
+      height: 40px;
+      pointer-events: none;
+      z-index: 9999;
+      transition: transform 0.1s ease-out;
+      will-change: transform;
+    }
+    .cursor-shape {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(45deg, #f39c12, #e74c3c, #9b59b6, #1abc9c);
+      clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+      animation: rotate 2s linear infinite;
+    }
+    @keyframes rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .cursor-trail {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      pointer-events: none;
+      animation: fade-out 0.5s ease-out forwards;
+    }
+    @keyframes fade-out {
+      to { opacity: 0; transform: scale(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Custom Cursor Shape</h1>
+    <p>Move your mouse around to see the custom rotating cursor in action. The standard cursor is hidden, replaced by a colorful star shape.</p>
+  </div>
+
+  <div class="custom-cursor" id="cursor">
+    <div class="cursor-shape"></div>
+  </div>
+
+  <script>
+    const cursor = document.getElementById('cursor');
+    const body = document.body;
+    let mouseX = 0;
+    let mouseY = 0;
+    let cursorX = 0;
+    let cursorY = 0;
+    let trails = [];
+
+    function updateCursor(event) {
+      mouseX = event.clientX;
+      mouseY = event.clientY;
+
+      // Create trail
+      const trail = document.createElement('div');
+      trail.className = 'cursor-trail';
+      trail.style.left = `${mouseX - 10}px`;
+      trail.style.top = `${mouseY - 10}px`;
+      body.appendChild(trail);
+      trails.push(trail);
+
+      // Remove old trails
+      if (trails.length > 10) {
+        const oldTrail = trails.shift();
+        if (oldTrail.parentNode) {
+          oldTrail.parentNode.removeChild(oldTrail);
+        }
+      }
+    }
+
+    function animateCursor() {
+      cursorX += (mouseX - cursorX) * 0.1;
+      cursorY += (mouseY - cursorY) * 0.1;
+      cursor.style.transform = `translate(${cursorX - 20}px, ${cursorY - 20}px)`;
+      requestAnimationFrame(animateCursor);
+    }
+
+    window.addEventListener('mousemove', updateCursor);
+    animateCursor();
+  </script>
+</body>
+</html>
